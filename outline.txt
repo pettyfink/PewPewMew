@@ -1,0 +1,52 @@
+# PewPewMew
+# Outline
+
+Keep it as basic as possible
+First phase is complete when these are met:
+- Half-Life-ish movement
+    * WASD
+    * Jump
+    * Crouch
+- Weapons
+    * Melee
+    * bat
+    * pistol
+    * dual pistols
+    * shotgun
+    * smg
+    * rifle 
+- Weapon system
+    * Pickups
+    * Unique ammo
+- Anywhere kick (tail?) like in Duke Nukem
+- Basic NPC AI
+    * Hear player sounds
+    * See player
+    * When > 20% health, attack player and follow
+    * When < 20% health, maintain distance, strafe and attack
+- Basic enemy types 
+    * Pistol
+    * Low health Shotgun
+    * High damage melee
+    * High health Shotgun + 100dmg Melee
+- Basic level
+    * Starting point
+    * Ending point (button/switch like Doom/Duke/Wolfenstein)
+    * Pickups
+    * Surprise
+    * Secret (climb to get something cool? follow laser pointer through wall?)
+    * Obstacle to exit (key, button to raise bridge, damage wall, etc.)
+
+-----------------------------------------------------------------------------
+
+Ideas after first phase
+- Add stunting
+    * a simple WASD dive
+    * WASD roll (double tap crouch)
+- Environment interaction
+    * Breakables [glass, boxes, etc.]
+    * Pushables [boxes, office chairs, things to use for cover, etc.]
+    * Useless interactables (press E to play with yarn ball)
+    * Doors
+    * Elevators
+- Super basic cars? Is it possible?

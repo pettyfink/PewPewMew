@@ -1,0 +1,275 @@
+extends KinematicBody
+
+var MOVE_SPEED = 0
+const WALK_SPEED = 6
+const RUN_SPEED = WALK_SPEED*2
+const JUMP_FORCE = 18
+const GRAVITY = 0.98
+const MAX_FALL_SPEED = 30
+
+const H_LOOK_SENS = .16
+const V_LOOK_SENS = .16
+
+onready var anim = $CamBase/GraphicsBase/Graphics/AnimationPlayer
+
+onready var colshape = $CollisionShape
+onready var area = $Area
+onready var raycast = $CamBase/ClippedCamera/RayCast
+
+onready var mesh = $CamBase/GraphicsBase/Graphics
+onready var hand = $CamBase/GraphicsBase/Hand
+
+onready var cam = $CamBase
+onready var viewport = $CamBase/ClippedCamera
+
+onready var crosshair = $CamBase/ClippedCamera/Crosshair
+onready var ammo_display = $CamBase/ClippedCamera/Ammo_display
+onready var health_display = $CamBase/ClippedCamera/Health_display
+onready var color_overlay = $CamBase/ClippedCamera/ColorOverlay
+onready var timer_overlay = $CamBase/ClippedCamera/TimerOverlay
+
+onready var res_knife_p = preload("res://knife_p.tscn")
+onready var res_pistol_p = preload("res://pistol_p.tscn")
+onready var active_attack_tool = null
+
+var y_velo = 0
+var x_velo = 0
+var z_velo = 0
+var rot_velo = 0
+
+var health = 100
+var last_health
+var dead = false
+var finished = false
+
+#var resources = {
+#	'knife': res_knife_p,
+#	'pistol': res_pistol_p
+#}
+
+var inventory = []
+
+func _ready():
+	anim.get_animation("walk").set_loop(true)
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	inventory.append('knife')
+	inventory.append('freekey')
+	color_overlay.color = Color(0,0,0,0)
+	last_health = health
+	
+func _input(event):
+	if dead:
+		return
+		
+	if event is InputEventMouseMotion:
+		cam.rotation_degrees.x -= event.relative.y * V_LOOK_SENS
+		cam.rotation_degrees.x = clamp(cam.rotation_degrees.x, -90, 90)
+		rotation_degrees.y -= event.relative.x * H_LOOK_SENS
+
+func _physics_process(delta):
+	var move_vec = Vector3()
+	var grounded = is_on_floor()
+	
+	if finished:
+		finished_overlay()
+		return
+
+	if !dead and health < last_health:
+		pain_overlay()
+		update_text()
+	last_health = health
+		
+	if health < 1:
+		dead = true
+		mesh.translation.y = -0.55599
+		mesh.translation.z = -0.51
+		if mesh.rotation.x > -1.35:
+			mesh.rotation.x -= .135
+		if colshape.rotation.x < 3.040795:
+			colshape.rotation.x += .304
+		cam.rotation_degrees.x += .1
+		return
+
+	if Input.is_action_pressed("run"):
+		MOVE_SPEED = RUN_SPEED
+	else:
+		MOVE_SPEED = WALK_SPEED
+		
+	if grounded:
+		z_velo = 0
+		x_velo = 0
+		rot_velo = rotation.y
+		if Input.is_action_pressed("move_forwards"):
+			z_velo -= 1
+			move_vec.z = z_velo
+#			move_vec.z -= 1
+		if Input.is_action_pressed("move_backwards"):
+			z_velo += 1
+			move_vec.z = z_velo
+#			move_vec.z += 1
+		if Input.is_action_pressed("move_left"):
+			x_velo -= 1
+			move_vec.x = x_velo
+#			move_vec.x -= 1
+		if Input.is_action_pressed("move_right"):
+			x_velo += 1
+			move_vec.x = x_velo
+#			move_vec.x += 1
+
+	else:
+		move_vec.z = z_velo
+		move_vec.x = x_velo
+		if Input.is_action_pressed("move_forwards"):
+			move_vec.z -= .5
+		if Input.is_action_pressed("move_backwards"):
+			move_vec.z += .5
+		if Input.is_action_pressed("move_left"):
+			move_vec.x -= .5
+		if Input.is_action_pressed("move_right"):
+			move_vec.x += .5	
+	
+	move_vec = move_vec.normalized()
+#	move_vec = move_vec.rotated(Vector3(0, 1, 0), rotation.y)
+	move_vec = move_vec.rotated(Vector3(0, 1, 0), rot_velo)
+	move_vec *= MOVE_SPEED
+	move_vec.y = y_velo
+	move_and_slide(move_vec, Vector3(0, 1, 0))
+	
+#	var grounded = is_on_floor()
+	y_velo -= GRAVITY
+	var just_jumped = false
+	if grounded and Input.is_action_just_pressed("jump"):
+		just_jumped = true
+		y_velo = JUMP_FORCE
+	if grounded and y_velo <= 0:
+#		y_velo = -0.1 # This was vibrating on walls
+		y_velo = -0.1
+	if y_velo < -MAX_FALL_SPEED:
+		y_velo = -MAX_FALL_SPEED
+
+	if Input.is_action_pressed("crouch"):
+		mesh.translation.y = -0.55599
+		mesh.translation.z = -0.51
+		if mesh.rotation.x > -1.35:
+			mesh.rotation.x -= .135
+		if colshape.rotation.x < 3.040795:
+			colshape.rotation.x += .304
+		if viewport.translation.y > -0.19:
+			viewport.translation.y -= 0.0475
+
+	if Input.is_action_just_released("crouch"):
+		mesh.translation.y = -1.06599
+		mesh.translation.z = 0
+		if mesh.rotation.x != 0:
+			mesh.rotation.x = 0
+		colshape.rotation.x = 1.570796
+		viewport.translation.y = 0.409213
+		
+#		colshape.shape.height = 0.597066
+#		mesh.translation.y = 0
+
+	if !grounded:
+		play_anim("jump")
+	elif grounded:
+		if move_vec.x == 0 and move_vec.z == 0:
+			play_anim("idle")
+		else:
+			play_anim("walk")
+
+	if Input.is_action_just_pressed("use"):
+		var collider = raycast.get_collider()
+		if collider:
+			if collider.is_in_group("door"):
+				var access_granted = collider.key in inventory
+				if access_granted:
+					collider.open()
+			if collider.is_in_group("interactable"):
+				collider.interact()
+				if "exit_button_body" == collider.name:
+					finished = collider.player_in_range
+
+	if Input.is_action_just_pressed("attack"):
+		# Get active attack_tool
+		# active_attack_tool.attack()
+		if active_attack_tool:
+			if active_attack_tool.use_raycast:
+				active_attack_tool.attack(raycast)
+			else:
+				active_attack_tool.attack()
+			update_text()
+#			if active_attack_tool.has_ammo:
+#				ammo_display.text = str(active_attack_tool.magazine_ammo)
+
+	if Input.is_action_just_pressed("reload"):
+		if active_attack_tool:
+			active_attack_tool.reload()
+		update_text()
+
+	if Input.is_action_just_pressed("console"):
+		pass
+
+	if Input.is_action_just_pressed("debug_button"):
+		print(raycast.get_collider().name)
+
+	if Input.is_action_just_pressed("debug_button2"):
+		get_tree().change_scene("res://World.tscn")
+
+	if Input.is_action_just_pressed("inv_slot_1"):
+		# Equip knife for now
+		if hand.get_child_count() > 0:
+			for held in hand.get_children():
+				held.queue_free()
+		var knife_p = res_knife_p.instance()
+		hand.add_child(knife_p)
+		knife_p.rotation = hand.rotation
+		crosshair.visible = false
+		knife_p.draw_tool()
+		active_attack_tool = knife_p
+		
+	if Input.is_action_just_pressed("inv_slot_2"):
+		if hand.get_child_count() > 0:
+			for held in hand.get_children():
+				held.queue_free()
+
+		var pistol_p = res_pistol_p.instance()
+		hand.add_child(pistol_p)
+		pistol_p.rotation = hand.rotation
+		crosshair.visible = true
+		pistol_p.draw_tool()
+		active_attack_tool = pistol_p
+
+func play_anim(name):
+	if anim.current_animation == name:
+		return
+	anim.play(name)
+
+func update_text():
+	if active_attack_tool:
+		if active_attack_tool.has_ammo:
+			ammo_display.text = str(active_attack_tool.magazine_ammo) + ' / ' + str(active_attack_tool.carry_ammo)
+	health_display.text = str(health)
+
+func pain_overlay():
+	color_overlay.color = Color(255, 0, 0, .1)
+	color_overlay.visible = true
+	timer_overlay.start()
+	if timer_overlay.is_stopped():
+		color_overlay.visible = false
+		
+func finished_overlay():
+	color_overlay.color = Color(255, 255, 255, .1)
+	color_overlay.visible = true
+#	timer_overlay.start()
+#	if timer_overlay.is_stopped():
+#		color_overlay.visible = false
+
+func _on_TimerOverlay_timeout():
+	color_overlay.visible = false
+
+
+func _on_Area_area_entered(area):
+	if area.is_in_group("ammo"):
+		pass
+	if area.is_in_group("pickups"):
+		inventory.append(area.name)
+		area.get_parent().queue_free()
