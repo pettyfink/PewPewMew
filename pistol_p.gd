@@ -36,10 +36,26 @@ func attack(raycast):
 	if collider == null:
 		return
 		
+	if collider is RigidBody:
+		var impulse_direction = raycast.global_transform.origin - collider.global_transform.origin
+		var impulse_force = impulse_direction * .25
+		collider.apply_impulse(impulse_force, Vector3.UP)
+		# collider.apply_impulse(impulse_force, -impulse_force * 5)
+
 	if !collider.is_in_group("damage_taker") and collider is CSGCombiner:
 		var collider_children = collider.get_children()
-		print(len(collider.get_children()))
-		if len(collider_children) > 5:
+		# print(len(collider.get_children()))
+		# if len(collider_children) > 5:
+		# 	for child in collider_children:
+		# 		if child is CSGSphere:
+		# 			child.queue_free()
+		# 			break
+		var collider_holes = 0
+		for child in collider_children:
+			if child is CSGSphere:
+				collider_holes += 1
+		# if len(collider_children) > 5:
+		if collider_holes > 5:
 			for child in collider_children:
 				if child is CSGSphere:
 					child.queue_free()

@@ -8,9 +8,13 @@
 
 [node name="target_dummy" type="KinematicBody" groups=[
 "damage_taker",
+"interactable",
 ]]
 transform = Transform( 0.5, 0, 0, 0, 0.558871, 0, 0, 0, 0.5, 0, 0.884564, 0 )
 script = ExtResource( 1 )
+__meta__ = {
+"_editor_description_": "target_dummy"
+}
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Catbot_Metro.gd" type="Script" id=1]
 [ext_resource path="res://metro_hardhat.tscn" type="PackedScene" id=2]
@@ -849,13 +849,86 @@ tracks/12/keys = {
 "values": [ false, true, false ]
 }
 
+[sub_resource type="Animation" id=13]
+resource_name = "walk"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Legs/r_upperleg:translation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( -0.534674, -1.43471, 1.39064 ), Vector3( -0.534674, -1.43471, 0 ), Vector3( -0.534674, -1.43471, -0.747256 ), Vector3( -0.534674, -1.43471, 1.39064 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Legs/r_upperleg:rotation_degrees")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( -48.7894, 1.15513e-06, -2.89394e-06 ), Vector3( 0, 0, 0 ), Vector3( 47.2602, 1.04369e-06, 2.69244e-06 ), Vector3( -48.7894, 1.15513e-06, -2.89394e-06 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Legs/l_upperleg:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 56.5485, 1.94793e-06, 4.24873e-06 ), Vector3( 0, 0, 0 ), Vector3( -51.644, 1.39685e-06, -3.32015e-06 ), Vector3( 56.5485, 1.94793e-06, 4.24873e-06 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Body/Legs/l_upperleg:translation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0.512546, -1.43471, -1.52875 ), Vector3( 0.512546, -1.43471, 0 ), Vector3( 0.512546, -1.43471, 1.38394 ), Vector3( 0.512546, -1.43471, -1.52875 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Body/Legs/r_upperleg:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0.31593, 1.94319, 0.472524 ), Vector3( 0.31593, 1.44704, 0.51898 ), Vector3( 0.31593, 1.90759, 0.476479 ), Vector3( 0.31593, 1.94319, 0.472524 ) ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Body/Legs/l_upperleg:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0.31593, 1.98406, 0.467395 ), Vector3( 0.31593, 1.33399, 0.54262 ), Vector3( 0.31593, 1.85709, 0.485426 ), Vector3( 0.31593, 1.98406, 0.467395 ) ]
+}
+
 [node name="Catbot_Metro" type="KinematicBody" groups=[
 "damage_taker",
 ]]
 script = ExtResource( 1 )
-weapon_choice = null
-has_hardhat = null
-patrol = null
 
 [node name="CatbotCollision" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000364423, 0.67824, 0 )
@@ -902,12 +975,12 @@ material/0 = null
 transform = Transform( 0.204152, 0, 0, 0, 0.25, 0, 0, 0, 0.115351, 0, -0.252984, 0 )
 
 [node name="r_upperleg" type="MeshInstance" parent="Body/Legs"]
-transform = Transform( 0.31593, 0, 0, 0, 0.979688, 0, 0, 0, 0.599894, -0.534674, -1.43471, 0 )
+transform = Transform( 0.31593, 0, 0, 0, 1.93081, 0, 0, 0, 0.473899, -0.534674, -1.43471, 0 )
 mesh = SubResource( 7 )
 material/0 = null
 
 [node name="l_upperleg" type="MeshInstance" parent="Body/Legs"]
-transform = Transform( 0.31593, 0, 0, 0, 0.979687, 0, 0, 0, 0.599894, 0.512546, -1.43471, 0 )
+transform = Transform( 0.31593, 0, 0, 0, 1.93992, 0, 0, 0, 0.473663, 0.512546, -1.43471, 0 )
 mesh = SubResource( 7 )
 material/0 = null
 
@@ -924,6 +997,7 @@ anims/die = SubResource( 9 )
 anims/die_idle = SubResource( 10 )
 anims/no_animation = SubResource( 11 )
 anims/pain = SubResource( 12 )
+anims/walk = SubResource( 13 )
 
 [node name="Area" type="Area" parent="."]
 transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -0.220977 )
@@ -943,11 +1017,6 @@ one_shot = true
 [node name="DelayTimer" type="Timer" parent="."]
 one_shot = true
 
-[node name="PatrolTimer" type="Timer" parent="."]
-wait_time = 5.0
-one_shot = true
-
 [connection signal="body_entered" from="Area" to="." method="_on_Area_body_entered"]
 [connection signal="body_exited" from="Area" to="." method="_on_Area_body_exited"]
 [connection signal="timeout" from="DelayTimer" to="." method="_on_DelayTimer_timeout"]
-[connection signal="timeout" from="PatrolTimer" to="." method="_on_PatrolTimer_timeout"]

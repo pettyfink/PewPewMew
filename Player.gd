@@ -389,6 +389,9 @@ func _physics_process(delta):
 					if access_granted:
 						collider.open()
 				if collider.is_in_group("interactable"):
+					# if collider.editor_description == "target_dummy":
+					# 	collider.interact(global_transform)
+					# else:
 					collider.interact()
 					if "exit_button_body" == collider.name:
 						finished = collider.player_in_range
@@ -449,8 +452,8 @@ func _physics_process(delta):
 			console.grab_focus()
 			# vim://" console_interpret "
 
-		if Input.is_action_just_pressed("debug_button"): # O
-			raycast.cast_to.x += 1
+		# if Input.is_action_just_pressed("debug_button"): # O
+		# 	pass
 
 		if Input.is_action_just_pressed("debug_button2"): # P
 			get_tree().change_scene("res://World.tscn")

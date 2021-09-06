@@ -14,7 +14,6 @@ onready var res_shotgun_w = preload("res://shotgun_w.tscn")
 
 onready var attack_timer = $AttackTimer
 onready var delay_timer = $DelayTimer
-onready var patrol_timer = $PatrolTimer
 
 const GRAVITY = 0.98
 const MAX_FALL_SPEED = 30
@@ -32,20 +31,7 @@ var active_attack_tool
 var delay_timeout = false
 export var weapon_choice: String
 export var has_hardhat: bool
-export var patrol: bool
 onready var hardhat = $Body/Head/metro_hardhat
-
-# Patrol vars
-var is_patrolling
-var patrol_original_pos
-var patrol_negative_x_paces_made
-var patrol_positive_x_paces_made
-var patrol_negative_x_paces = 5
-var patrol_positive_x_paces = 5
-var patrol_west_pos
-var patrol_east_pos
-var patrol_routine = ['face_west','move_to_west_pos','face_east','move_to_east_pos','face_west','move_to_original_pos']
-var patrol_routine_index = 0
 
 func _ready():
 	if !weapon_choice:
@@ -55,14 +41,6 @@ func _ready():
 	
 	if has_hardhat:
 		hardhat.visible = true
-
-	if patrol:
-		patrol_original_pos = global_transform.origin
-		patrol_east_pos = patrol_original_pos
-		patrol_east_pos.x -= patrol_negative_x_paces
-		patrol_west_pos = patrol_original_pos
-		patrol_west_pos.x += patrol_negative_x_paces
-		is_patrolling = true
 
 func _process(delta):
 	if dead:
@@ -104,7 +82,6 @@ func _process(delta):
 		if active_attack_tool.magazine_ammo < 1:
 			active_attack_tool.reload()
 	if target:
-		is_patrolling = false
 		raycast.look_at(target.global_transform.origin, Vector3.UP)
 		var ray_collider = raycast.get_collider()
 		if ray_collider:
@@ -116,9 +93,6 @@ func _process(delta):
 				if delay_timeout:
 					attack(raycast)
 					delay_timeout = false
-	else:
-		if !is_patrolling and patrol_timer.is_stopped():
-			patrol_timer.start()
 					
 				
 	if last_target_origin:
@@ -130,15 +104,12 @@ func _process(delta):
 				
 				var last_self_origin = global_transform.origin
 				var move_difference = (global_transform.origin - last_self_origin)[0]
-				if move_difference < (move_speed*0.0001) and patrol_timer.is_stopped():
+				if move_difference < (move_speed*0.0001):
 					rotation_degrees.y += rand_range(-15,15)
 		if !target:
 			var direction = (last_target_origin - global_transform.origin).normalized()
 			move_and_slide(direction * move_speed * delta, Vector3.UP)				
 
-	if patrol and is_patrolling:
-
-		basic_patrol("walk", delta)
 
 func equip_weapon(weapon):
 	for held in hand.get_children():
@@ -182,60 +153,6 @@ func spawn_pistol():
 	pistol_w.apply_impulse(transform.basis.y, transform.basis.y * rand_range(.1,-.1))
 	pistol_w.apply_impulse(transform.basis.x, transform.basis.y * rand_range(.1,-.1))
 
-func basic_patrol(patrol_type, delta):
-	pass
-	# Patrol types = ['walk', 'look']
-	# Walk = Take x paces -= x, then x paces += x, then return to spot
-	#			Remember where left off
-	# Look = look 90 degrees left and 90 degrees right at interval
-	#if patrol_type == "walk":
-	#	# Turn left
-	#	# patrol_routine = ['face_west','move_to_west_pos','face_east','move_to_east_pos','face_west','move_to_original_pos']
-	#	if patrol_routine[patrol_routine_index] == 'face_west':
-	#		if rotation_degrees.y > 92 or rotation_degrees.y < 88:
-	#			rotation_degrees.y += 1
-	#		else:
-	#			rotation_degrees.y = 90
-	#			patrol_routine_index = 1
-
-	#	elif patrol_routine[patrol_routine_index] == 'move_to_west_pos':
-	#		var patrol_direction = (patrol_east_pos - global_transform.origin).normalized()
-	#		var pos_difference = patrol_east_pos.distance_to(global_transform.origin)
-	#		move_and_slide(patrol_direction * move_speed * delta, Vector3.UP)
-	#		patrol_east_pos.distance_to(global_transform.origin)
-	#		if pos_difference < .09:
-	#		# if patrol_direction.x > -0.05 or patrol_direction.x < 0.05:
-	#			patrol_routine_index = 2
-
-	#	elif patrol_routine[patrol_routine_index] == 'face_east':
-	#		if rotation_degrees.y < -92 or rotation_degrees.y > -88:
-	#			rotation_degrees.y -= 1
-	#		else:
-	#			rotation_degrees.y = -90
-	#			patrol_routine_index = 3
-
-	#	elif patrol_routine[patrol_routine_index] == 'move_to_east_pos':
-	#		var patrol_direction = (patrol_west_pos - global_transform.origin).normalized()
-	#		var pos_difference = patrol_east_pos.distance_to(global_transform.origin)
-	#		move_and_slide(patrol_direction * move_speed * delta, Vector3.UP)
-	#		if pos_difference < .09:
-	#			patrol_routine_index = 4
-
-	#	elif patrol_routine[patrol_routine_index] == 'face_west':
-	#		if rotation_degrees.y > 92 or rotation_degrees.y < 88:
-	#			rotation_degrees.y += 1
-	#		else:
-	#			rotation_degrees.y = 90
-	#			patrol_routine_index = 5
-
-	#	elif patrol_routine[patrol_routine_index] == 'move_to_original_pos':
-	#		var patrol_direction = (patrol_original_pos - global_transform.origin).normalized()
-	#		var pos_difference = patrol_east_pos.distance_to(global_transform.origin)
-	#		move_and_slide(patrol_direction * (move_speed * 2) * delta, Vector3.UP)
-	#		if pos_difference < .09:
-	#			patrol_routine_index = 0
-
-
 func _on_Area_body_entered(body):
 	if body.is_in_group("Player") and !dead:
 		target = body
@@ -250,8 +167,3 @@ func _on_Area_body_exited(body):
 func _on_DelayTimer_timeout():
 	delay_timeout = true
 
-
-func _on_PatrolTimer_timeout():
-	is_patrolling = true
-	last_target_origin = null
-	patrol_routine_index = 5

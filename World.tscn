@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://bottle.tscn" type="PackedScene" id=2]
@@ -9,6 +9,9 @@
 [ext_resource path="res://Assets/01murocrep512.jpg" type="Texture" id=7]
 [ext_resource path="res://pistol_w.tscn" type="PackedScene" id=8]
 [ext_resource path="res://shotgun_w.tscn" type="PackedScene" id=9]
+[ext_resource path="res://phys_ball.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Mover.tscn" type="PackedScene" id=11]
+[ext_resource path="res://World.gd" type="Script" id=12]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_texture = ExtResource( 7 )
@@ -39,12 +42,36 @@ data = PoolVector3Array( -1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, -1, 1, -1, -1
 flags_unshaded = true
 albedo_color = Color( 1, 0.678431, 0, 1 )
 
+[sub_resource type="BoxShape" id=11]
+
+[sub_resource type="CubeMesh" id=12]
+
 [node name="World" type="Spatial"]
+script = ExtResource( 12 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.549504, 0.835491, 0, -0.835491, 0.549504, 0, 1.19119, 1.28937 )
 visible = false
 light_energy = 0.25
+
+[node name="CSGCombiner3" type="CSGCombiner" parent="."]
+use_collision = true
+
+[node name="CSGBox3" type="CSGBox" parent="CSGCombiner3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06414, 0.4686, 4.1273 )
+width = 1.65691
+height = 0.689189
+depth = 4.52245
+material = SubResource( 1 )
+
+[node name="CSGCombiner2" type="CSGCombiner" parent="."]
+use_collision = true
+
+[node name="CSGBox4" type="CSGBox" parent="CSGCombiner2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.20224, 1.15478, 0 )
+width = 1.69726
+depth = 0.105781
+material = SubResource( 1 )
 
 [node name="CSGCombiner" type="CSGCombiner" parent="."]
 use_collision = true
@@ -53,15 +80,12 @@ use_collision = true
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06414, 1.15478, 0 )
 material = SubResource( 1 )
 
-[node name="CSGBox2" type="CSGBox" parent="CSGCombiner"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06414, 1.15478, 7.93907 )
+[node name="CSGBox5" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.36414, 1.15478, 0 )
 material = SubResource( 1 )
 
-[node name="CSGBox3" type="CSGBox" parent="CSGCombiner"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06414, 0.4686, 4.1273 )
-width = 1.65691
-height = 0.689189
-depth = 4.52245
+[node name="CSGBox2" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06414, 1.15478, 7.93907 )
 material = SubResource( 1 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
@@ -309,6 +333,22 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.81029, 1.36147, 4.09904 )
 
 [node name="RigidBody4" parent="." instance=ExtResource( 9 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.81743, 1.36147, 5.12706 )
+
+[node name="phys_ball" parent="." instance=ExtResource( 10 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5084, -7.84206 )
+
+[node name="Mover" parent="." instance=ExtResource( 11 )]
+transform = Transform( 0.746789, 0, -0.665061, 0, 1, 0, 0.665061, 0, 0.746789, 9.10524, 1.71564, 0 )
+
+[node name="StaticBody" type="StaticBody" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11.6013, 1.94727, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
+shape = SubResource( 11 )
+
+[node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
+mesh = SubResource( 12 )
+material/0 = null
 
 [editable path="Player"]
 [editable path="Player/CamBase/GraphicsBase/Graphics"]

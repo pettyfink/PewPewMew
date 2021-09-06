@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Mover.gd" type="Script" id=1]
+
+[sub_resource type="CubeMesh" id=2]
+
+[sub_resource type="SphereShape" id=3]
+
+[node name="Mover" type="Spatial"]
+script = ExtResource( 1 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="test_body" type="KinematicBody" parent="."]
+
+[node name="MeshInstance" type="MeshInstance" parent="test_body"]
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="test_body"]
+shape = SubResource( 3 )
