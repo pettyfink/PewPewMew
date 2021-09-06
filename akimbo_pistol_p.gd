@@ -91,6 +91,9 @@ func attack(raycast):
 		collider.add_child(csg_subtraction_box)
 		var collision_point = raycast.get_collision_point()
 		csg_subtraction_box.global_transform.origin = collision_point
+	
+	if collider.is_in_group("damage_taker"):
+		collider.health -= damage
 
 
 func reload():
