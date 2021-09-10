@@ -1,5 +1,6 @@
 extends KinematicBody
-
+# Note, collisionshape's X scale was 1. Now it fits through shotgun holes
+# If there are problems, just change it back to 1.
 var MOVE_SPEED = 0
 const WALK_SPEED = 6
 const RUN_SPEED = WALK_SPEED*2
@@ -373,11 +374,14 @@ func _physics_process(delta):
 			viewport.translation.y = 0.409213
 
 	if !grounded:
+		anim.playback_default_blend_time = .05
 		play_anim("jump")
 	elif grounded:
 		if move_vec.x == 0 and move_vec.z == 0:
+			anim.playback_default_blend_time = .1
 			play_anim("idle")
 		else:
+			anim.playback_default_blend_time = .1
 			play_anim("walk")
 
 	if !block_player_controls:
