@@ -1,0 +1,13 @@
+[remap]
+
+importer="qodot.map"
+type="Resource"
+path="res://.import/labratory.map-d6223c3f63e074e659052c903f348c35.tres"
+
+[deps]
+
+source_file="res://maps/labratory.map"
+dest_files=[ "res://.import/labratory.map-d6223c3f63e074e659052c903f348c35.tres" ]
+
+[params]
+

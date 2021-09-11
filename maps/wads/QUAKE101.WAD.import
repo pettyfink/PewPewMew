@@ -1,0 +1,14 @@
+[remap]
+
+importer="qodot.wad"
+type="Resource"
+path="res://.import/QUAKE101.WAD-f5fbaef5b436457b82976a0342a11046.tres"
+
+[deps]
+
+source_file="res://maps/wads/QUAKE101.WAD"
+dest_files=[ "res://.import/QUAKE101.WAD-f5fbaef5b436457b82976a0342a11046.tres" ]
+
+[params]
+
+palette_file="res://addons/qodot/palette.lmp"
