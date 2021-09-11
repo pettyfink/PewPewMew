@@ -218,7 +218,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/qodot/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/godot-navigation-lite/plugin.cfg", "res://addons/qodot/plugin.cfg" )
 
 [gdnative]
 

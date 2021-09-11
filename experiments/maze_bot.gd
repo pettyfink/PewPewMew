@@ -2,7 +2,7 @@ extends KinematicBody
 
 var speed = 2
 onready var nav = get_parent()
-onready var player = $"../../Player"
+onready var player = $"../../../Player"
 onready var mover = $Mover
 onready var feeler = $Feeler
 var path = []
