@@ -1,0 +1,23 @@
+# 
+
+Never a player:
+    Idle, maybe patrol. Manage needs like low energy, reload (scavenge for ammo?)
+
+Player in area:
+    If player viewable, alert
+    attack player
+
+Player left area:
+    Start forget_timer
+    Until forget_timer stops:
+        If sensor_raycast can see player:
+                Change state to CHASE
+                (Turn to face player with sensor_raycast)
+        Else:
+                Walk to last_target.origin
+                If colliding with StaticBody:
+                    Move away by relative X
+
+Forget_timer stops:
+    Look around
+    Change state to IDLE

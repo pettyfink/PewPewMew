@@ -14,14 +14,12 @@ func _ready():
 	metro_mover.global_transform = mover_nodetest.global_transform
 
 func _physics_process(delta):
-	if Input.is_action_just_pressed("debug_button"):
-		print('doing nothing, please delete me. I\'m in World.gd')
-
-	if Input.is_action_just_pressed('ui_up'):
-		mover_nodetest.move_forwards(metro_mover, 3)
-	if Input.is_action_just_pressed('ui_down'):
-		mover_nodetest.move_backwards(metro_mover, 3)
-	if Input.is_action_just_pressed('ui_right'):
-		mover_nodetest.move_right(metro_mover, 3)
-	if Input.is_action_just_pressed('ui_left'):
-		mover_nodetest.move_left(metro_mover, 3)
+	pass
+	# if Input.is_action_just_pressed('ui_up'):
+	# 	mover_nodetest.move_forwards(metro_mover, 3)
+	# if Input.is_action_just_pressed('ui_down'):
+	# 	mover_nodetest.move_backwards(metro_mover, 3)
+	# if Input.is_action_just_pressed('ui_right'):
+	# 	mover_nodetest.move_right(metro_mover, 3)
+	# if Input.is_action_just_pressed('ui_left'):
+	# 	mover_nodetest.move_left(metro_mover, 3)
