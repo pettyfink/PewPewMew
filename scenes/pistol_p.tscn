@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://scripts/pistol_p.gd" type="Script" id=1]
 
@@ -1461,6 +1461,9 @@ albedo_color = Color( 0, 0, 0, 1 )
 [sub_resource type="SpatialMaterial" id=12]
 albedo_color = Color( 0.529412, 0.529412, 0.529412, 1 )
 
+[sub_resource type="SphereShape" id=13]
+radius = 11.8129
+
 [node name="pistol_p" type="Spatial"]
 script = ExtResource( 1 )
 __meta__ = {
@@ -1522,3 +1525,8 @@ material/0 = null
 transform = Transform( 0.0145887, 0, 0, 0, 0.0813206, 0.00510833, 0, -0.0151923, 0.0273436, 0, -0.21511, 0.120038 )
 mesh = SubResource( 10 )
 material/0 = SubResource( 12 )
+
+[node name="sound_area" type="Area" parent="."]
+
+[node name="sound_collision_shape" type="CollisionShape" parent="sound_area"]
+shape = SubResource( 13 )

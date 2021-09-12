@@ -992,7 +992,22 @@ shape = SubResource( 115 )
 shape = SubResource( 116 )
 
 [node name="Catbot_Metro" parent="Labratory" instance=ExtResource( 14 )]
-transform = Transform( -0.998522, 0, -0.0543576, 0, 1, 0, 0.0543576, 0, -0.998522, -10.0667, 4.01683, 0.999817 )
+transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -42.0078, 1.00735, -10.9687 )
+
+[node name="Catbot_Metro2" parent="Labratory" instance=ExtResource( 14 )]
+transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -32.8958, 1.00735, -10.9687 )
+
+[node name="Catbot_Metro3" parent="Labratory" instance=ExtResource( 14 )]
+transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -32.3119, 1.00735, -7.05467 )
+weapon_choice = "shotgun"
+
+[node name="Catbot_Metro4" parent="Labratory" instance=ExtResource( 14 )]
+transform = Transform( 0.464595, 0, 0.885524, 0, 1, 0, -0.885524, 0, 0.464595, -44.1476, 1.00735, -6.75481 )
+weapon_choice = "shotgun"
+
+[node name="Catbot_Metro5" parent="Labratory" instance=ExtResource( 5 )]
+transform = Transform( 0.0363995, 0, -0.999337, 0, 1, 0, 0.999337, 0, 0.0363995, -31.2243, 0.899843, -14.2736 )
+weapon_choice = "pistol"
 
 [node name="CSGCombiner3" type="CSGCombiner" parent="."]
 use_collision = true

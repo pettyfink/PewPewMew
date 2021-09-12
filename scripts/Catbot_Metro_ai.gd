@@ -1,9 +1,10 @@
 extends KinematicBody
 
 onready var anim = $AnimationPlayer
+onready var anim_raycast = $RaycastAnimationPlayer
 onready var head = $Body/Head
 onready var sight_area = $Body/Head/sight_area
-onready var raycast = $Body/Head/goggle_raycast
+onready var raycast = $Body/Head/raycast
 onready var sensor_raycast = $sensor_raycast
 onready var eyes = $eyes
 onready var player = $"../../../Player"
@@ -21,6 +22,8 @@ onready var res_shotgun_p = preload("res://scenes/shotgun_p.tscn")
 onready var res_shotgun_w = preload("res://scenes/shotgun_w.tscn")
 onready var hand = $Body/Hand
 var active_attack_tool
+var is_attacking = false
+var attack_heard = false
 
 var health = 35
 var last_health
@@ -38,6 +41,7 @@ var last_static_rotation
 var is_look_direction_left = true
 
 onready var init_timer = $init_timer
+onready var attack_timer = $attack_timer
 onready var turn_timer = $turn_timer
 onready var state_flip_timer = $state_flip_timer
 onready var forget_timer = $forget_timer
@@ -46,7 +50,7 @@ enum {
 	IDLE,
 	ALERT,
 	CHASE,
-	STATIC_ATTACK,
+	MOVING,
 	LOOK_AROUND,
 	FLEE,
 	DEAD_IDLE
@@ -69,41 +73,25 @@ func _ready():
 func _process(delta):
 	gravity_force()
 
+	death_manager()
 	if dead:
 		return
 
-	death_manager()
 	pain_reaction()
 	reload_manager()
 
 
-####
-# Player in area:
-#     If player viewable, alert
-#     attack player
-# 
-# Player left area:
-#     Start forget_timer
-#     Until forget_timer stops:
-#         If sensor_raycast can see player:
-#                 Change state to CHASE
-#                 (Turn to face player with sensor_raycast)
-#         Else:
-#                 Walk to last_target.origin
-#                 If colliding with StaticBody:
-#                     Move away by relative X
-# 
-# Forget_timer stops:
-#     Look around
-#     Change state to IDLE
-# 
-####
 	if Input.is_action_just_pressed("debug_button"): # O
 		print(state)
+
+	if attack_heard:
+		state = MOVING
 	match state:
 		IDLE:
-			# anim.stop()
-			# anim.play("Idle")
+			# if attack_heard:
+			# 	state = MOVING
+			# 	attack_heard = false
+
 			var is_target_viewable = check_target_viewable()
 			if is_target_viewable:
 				state = ALERT
@@ -120,43 +108,34 @@ func _process(delta):
 				else:
 					anim.stop()
 					anim.play("Idle")
-			# If !is_busy:
-				# If is_energy_low and known_recharge_node:
-				#	(maybe switch to a charging state, set is_busy = true)
-				#	go to the closest recharge node
-				#	recharge
-				#	return to original spot (add random chance, low possibility of staying)
-				# If is_energy_lwo and !known_recharge_node:
-				#	(maybe switch to a charging state, set is_busy = true)
-				#   spin sensor_raycast around and look for one
-				#	if sensor_collider.is_in_group("recharge_station"):
-				#		recharge
-				#		return to original spot (add random chance, low possibility of staying)
-				# If is_ammo_low
-				#	(maybe switch to an ammo_hunt state, set is_busy = true)
-				#	look for ammo until has 2 reloads worth
 
 		ALERT:
 			if target:
+				var distance = global_transform.origin.distance_to(target.global_transform.origin)
+				if distance > 10:
+					state = CHASE
+				
 				var is_target_viewable = check_target_viewable()
 				if is_target_viewable:
 					set_last_target_origin()
 					face_target()
+					if distance < 2:
+						attack_manager(sensor_raycast)
+					else:
+						attack_manager(raycast)
+
 				if last_target_origin and !is_target_viewable:
 					state = CHASE
 
-				var distance = global_transform.origin.distance_to(target.global_transform.origin)
-				if distance > 10:
-					state = CHASE
+
 			elif !target and last_target_origin:
 				state = CHASE
+
 			else:
 				print("No target and no last target origin.")
 
 		CHASE:
-			# anim.stop()
 			anim.play("walk")
-			print()
 			if target:
 				var is_target_viewable = check_target_viewable()
 				if is_target_viewable:
@@ -167,6 +146,7 @@ func _process(delta):
 					var distance = global_transform.origin.distance_to(target.global_transform.origin)
 					if distance <= 5:
 						state = ALERT
+
 				elif !is_target_viewable and last_target_origin:
 					var direction = (last_target_origin - global_transform.origin)
 					var distance = global_transform.origin.distance_to(last_target_origin)
@@ -175,8 +155,10 @@ func _process(delta):
 					move_and_slide(direction.normalized(), Vector3.UP)
 					if forget_timer.is_stopped():
 						forget_timer.start()
+
 				else:
 					print("I guess target can't be seen and no last target was found")
+
 
 			else:
 				var is_target_viewable = check_target_viewable()
@@ -190,9 +172,49 @@ func _process(delta):
 						forget_timer.start()
 					# state = LOOK_AROUND
 
-		STATIC_ATTACK:
-			anim.stop()
-			anim.play("Idle")
+		MOVING:
+			if attack_heard:
+				face_origin(last_target_origin)
+				attack_heard = false
+
+			var is_target_viewable = check_target_viewable()
+
+			if last_target_origin:
+				var direction = (last_target_origin - global_transform.origin)
+				var distance = global_transform.origin.distance_to(last_target_origin)
+				if distance < 1:
+					state = LOOK_AROUND
+				move_and_slide(direction.normalized(), Vector3.UP)
+				if forget_timer.is_stopped():
+					forget_timer.start()
+				# state = LOOK_AROUND
+				anim.play("walk")
+
+			if target or is_target_viewable:
+				state = CHASE
+			
+			if !target or !is_target_viewable:
+				face_origin(last_target_origin)
+
+			# if target:
+			# 	# var is_target_viewable = check_target_viewable()
+			# 	# if is_target_viewable:
+			# 	# 	state = CHASE
+			# 	state = CHASE
+
+			# elif !target and last_target_origin:
+			# 	var direction = (last_target_origin - global_transform.origin)
+			# 	var distance = global_transform.origin.distance_to(last_target_origin)
+			# 	if distance < 1:
+			# 		state = LOOK_AROUND
+			# 	move_and_slide(direction.normalized(), Vector3.UP)
+			# 	if forget_timer.is_stopped():
+			# 		forget_timer.start()
+			# 	# state = LOOK_AROUND
+			# 	anim.play("walk")
+
+			if !target and !last_target_origin:
+				state = IDLE
 
 		LOOK_AROUND:
 			if turn_timer.is_stopped():
@@ -217,9 +239,11 @@ func _process(delta):
 			anim.play("walk")
 
 		DEAD_IDLE:
-			anim.stop()
-			anim.play("die")
-			anim.queue("die_idle")
+			pass
+			# anim.stop()
+			# anim.play("die")
+			# anim.queue("die_idle")
+			# dead = true
 
 func equip_weapon(weapon):
 	for held in hand.get_children():
@@ -261,11 +285,13 @@ func pain_reaction():
 	last_health = health
 
 func death_manager():
+	if dead:
+		return
+
 	if health <= 0:
-		state = DEAD_IDLE
-		# anim.stop()
-		# anim.play("die")
-		# anim.queue("die_idle")
+		anim.stop()
+		anim.play("die")
+		anim.queue("die_idle")
 		if active_attack_tool:
 			if active_attack_tool.editor_description == 'pistol':
 				spawn_weapon(res_pistol_w)
@@ -278,7 +304,23 @@ func death_manager():
 		raycast.queue_free()
 		sensor_raycast.queue_free()
 		sight_area.queue_free()
+		state = DEAD_IDLE
 		dead = true
+
+func attack_manager(chosen_raycast):
+	if is_attacking:
+		anim_raycast.play("bounce")
+		anim_raycast.queue("bounce")
+		active_attack_tool.attack(chosen_raycast)
+		is_attacking = false
+		return
+	else:
+		# anim_raycast.stop()
+		# anim_raycast.play("Idle")
+		if attack_timer.is_stopped():
+			attack_timer.start()
+
+
 
 func reload_manager():
 	if active_attack_tool:
@@ -315,6 +357,10 @@ func face_target():
 	eyes.look_at(target.global_transform.origin, Vector3(0, 1, 0))
 	rotate_y(deg2rad(eyes.rotation.y * TURN_SPEED))
 
+func face_origin(vec_origin):
+	eyes.look_at(vec_origin, Vector3(0, 1, 0))
+	rotate_y(deg2rad(eyes.rotation.y * TURN_SPEED))
+
 func check_target_viewable():
 	if !target:
 		return false
@@ -327,7 +373,6 @@ func check_target_viewable():
 		return target_in_view
 
 func set_last_target_origin():
-	print('Func setting last_target_origin')
 	if !target:
 		return
 	last_target_origin = target.global_transform.origin
@@ -345,3 +390,6 @@ func _on_init_timer_timeout():
 	print('Setting original origin.')
 	original_origin = global_transform.origin
 	print(original_origin)
+
+func _on_attack_timer_timeout():
+	is_attacking = true

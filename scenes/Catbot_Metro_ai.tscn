@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://scripts/Catbot_Metro_ai.gd" type="Script" id=1]
 [ext_resource path="res://scenes/metro_hardhat.tscn" type="PackedScene" id=2]
@@ -929,9 +929,128 @@ tracks/5/keys = {
 "values": [ Vector3( 0.31593, 1.98406, 0.467395 ), Vector3( 0.31593, 1.33399, 0.54262 ), Vector3( 0.31593, 1.85709, 0.485426 ), Vector3( 0.31593, 1.98406, 0.467395 ) ]
 }
 
+[sub_resource type="Animation" id=17]
+resource_name = "Idle"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Head/raycast:cast_to")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, -2, 26.5 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Head/raycast:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( -0.0965885, 0.0230019, -8.44403e-09 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Head/raycast:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=18]
+resource_name = "bounce"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Head/raycast:cast_to")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 0.5, 1, 1.3, 1.5, 2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0, -2, 26.5 ), Vector3( 0, -5, 26.5 ), Vector3( 0, -4, 26.5 ), Vector3( 0, 1, 26.5 ), Vector3( 0, -5, 26.5 ), Vector3( 0, -2.5, 26.5 ), Vector3( 0, -2, 26.5 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Head/raycast:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( -0.0965885, 0.0230019, -8.44403e-09 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Head/raycast:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=19]
+resource_name = "no_animation"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Body/Head/raycast:cast_to")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, -2, 26.5 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Body/Head/raycast:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( -0.0965885, 0.0230019, -8.44403e-09 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Body/Head/raycast:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ) ]
+}
+
 [node name="Catbot_Metro" type="KinematicBody" groups=[
 "damage_taker",
 "faction_catbot",
+"sound_listener",
 ]]
 script = ExtResource( 1 )
 
@@ -971,10 +1090,10 @@ transform = Transform( 0.05, 0, 0, 0, -2.18557e-09, -0.05, 0, 0.05, -2.18557e-09
 mesh = SubResource( 4 )
 material/0 = SubResource( 5 )
 
-[node name="goggle_raycast" type="RayCast" parent="Body/Head"]
+[node name="raycast" type="RayCast" parent="Body/Head"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0965885, 0.0230019, -8.44403e-09 )
 enabled = true
-cast_to = Vector3( 0, 0, 26.5 )
+cast_to = Vector3( 0, -2, 26.5 )
 
 [node name="sight_area" type="Area" parent="Body/Head"]
 transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, 0 )
@@ -1024,6 +1143,14 @@ anims/no_animation = SubResource( 14 )
 anims/pain = SubResource( 15 )
 anims/walk = SubResource( 16 )
 
+[node name="RaycastAnimationPlayer" type="AnimationPlayer" parent="."]
+anims/Idle = SubResource( 17 )
+anims/bounce = SubResource( 18 )
+anims/no_animation = SubResource( 19 )
+
+[node name="init_timer" type="Timer" parent="."]
+one_shot = true
+
 [node name="turn_timer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
@@ -1036,17 +1163,17 @@ one_shot = true
 wait_time = 10.0
 one_shot = true
 
+[node name="attack_timer" type="Timer" parent="."]
+
 [node name="sensor_raycast" type="RayCast" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.943966, -0.231568 )
 enabled = true
 cast_to = Vector3( 0, 1, -40 )
 
-[node name="init_timer" type="Timer" parent="."]
-one_shot = true
-
 [connection signal="body_entered" from="Body/Head/sight_area" to="." method="_on_sight_area_body_entered"]
 [connection signal="body_exited" from="Body/Head/sight_area" to="." method="_on_sight_area_body_exited"]
+[connection signal="timeout" from="init_timer" to="." method="_on_init_timer_timeout"]
 [connection signal="timeout" from="turn_timer" to="." method="_on_turn_timer_timeout"]
 [connection signal="timeout" from="state_flip_timer" to="." method="_on_state_flip_timer_timeout"]
 [connection signal="timeout" from="forget_timer" to="." method="_on_forget_timer_timeout"]
-[connection signal="timeout" from="init_timer" to="." method="_on_init_timer_timeout"]
+[connection signal="timeout" from="attack_timer" to="." method="_on_attack_timer_timeout"]
