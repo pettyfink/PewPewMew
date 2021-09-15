@@ -1,0 +1,13 @@
+[remap]
+
+importer="qodot.map"
+type="Resource"
+path="res://.import/combat_test3.1.map-0d30326b5553d6ca1de68df6dc5faf2a.tres"
+
+[deps]
+
+source_file="res://maps/autosave/combat_test3.1.map"
+dest_files=[ "res://.import/combat_test3.1.map-0d30326b5553d6ca1de68df6dc5faf2a.tres" ]
+
+[params]
+

@@ -2,8 +2,9 @@ extends Spatial
 
 onready var anim = $AnimationPlayer
 onready var anim_effects = $Effects/EffectsPlayer
-
 onready var sound_area = $sound_area
+onready var sound_collision = $sound_area/sound_collision_shape
+
 var damage = 15
 var recoil = .8
 var use_raycast = true
@@ -35,10 +36,13 @@ func attack(raycast):
 	anim_effects.queue("hide")
 	anim.queue("Idle")
 
+	# sound_collision.disabled = false
 	for body in sound_area.get_overlapping_bodies():
 		if body.is_in_group("sound_listener"):
 			body.attack_heard = true
 			body.last_target_origin = global_transform.origin
+	# sound_collision.disabled = true
+
 
 	var collider = raycast.get_collider()
 	if collider == null:

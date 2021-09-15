@@ -995,7 +995,14 @@ shape = SubResource( 116 )
 transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -42.0078, 1.00735, -10.9687 )
 
 [node name="Catbot_Metro2" parent="Labratory" instance=ExtResource( 14 )]
-transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -32.8958, 1.00735, -10.9687 )
+transform = Transform( 0.0231586, 0, 0.999732, 0, 1, 0, -0.999732, 0, 0.0231586, -36.6477, 1.00735, -14.0357 )
+
+[node name="Catbot_Metro6" parent="Labratory" instance=ExtResource( 14 )]
+transform = Transform( 0.997274, 0, -0.0737953, 0, 1, 0, 0.0737953, 0, 0.997274, -37.1738, 1.00735, -5.68373 )
+
+[node name="Catbot_Metro7" parent="Labratory" instance=ExtResource( 14 )]
+transform = Transform( 0.999655, 0, 0.026299, 0, 1, 0, -0.026299, 0, 0.999655, -38.6961, 1.00735, -5.93203 )
+has_hardhat = true
 
 [node name="Catbot_Metro3" parent="Labratory" instance=ExtResource( 14 )]
 transform = Transform( 0.025636, 0, -0.999672, 0, 1, 0, 0.999672, 0, 0.025636, -32.3119, 1.00735, -7.05467 )
@@ -1006,7 +1013,7 @@ transform = Transform( 0.464595, 0, 0.885524, 0, 1, 0, -0.885524, 0, 0.464595, -
 weapon_choice = "shotgun"
 
 [node name="Catbot_Metro5" parent="Labratory" instance=ExtResource( 5 )]
-transform = Transform( 0.0363995, 0, -0.999337, 0, 1, 0, 0.999337, 0, 0.0363995, -31.2243, 0.899843, -14.2736 )
+transform = Transform( 0.0166671, 0, 0.999861, 0, 1, 0, -0.999861, 0, 0.0166671, -31.2243, 0.899843, -14.2736 )
 weapon_choice = "pistol"
 
 [node name="CSGCombiner3" type="CSGCombiner" parent="."]

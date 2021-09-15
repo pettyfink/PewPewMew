@@ -2,6 +2,8 @@ extends Spatial
 
 #onready var anim = $AnimationPlayer
 #onready var anim_effects = $Effects/EffectsPlayer
+onready var sound_area = $sound_area
+onready var sound_collision = $sound_area/sound_collision_shape
 
 onready var hacky_anim_fix = $hacky_anim_player
 onready var pistol1_anim = $pistol_p/AnimationPlayer
@@ -58,6 +60,13 @@ func attack(raycast):
 		pistol2_anim_effects.queue("hide")
 		pistol2_anim.queue("Idle")
 		shoot_toggle = 'pistol1'
+
+	sound_collision.disabled = false
+	for body in sound_area.get_overlapping_bodies():
+		if body.is_in_group("sound_listener"):
+			body.attack_heard = true
+			body.last_target_origin = global_transform.origin
+	sound_collision.disabled = true
 
 	var collider = raycast.get_collider()
 	if collider == null:

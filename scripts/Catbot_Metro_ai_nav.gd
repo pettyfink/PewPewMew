@@ -7,7 +7,20 @@ onready var sight_area = $Body/Head/sight_area
 onready var raycast = $Body/Head/raycast
 onready var sensor_raycast = $sensor_raycast
 onready var eyes = $eyes
-onready var player = $"../../../Player"
+# onready var player = $"../../../Player"
+
+### NAV
+export (NodePath) var nav_path
+export (NodePath) var player_path
+onready var nav = get_node(nav_path)
+onready var player = get_node(player_path)
+var nav_live_tracking = true
+var destination_origin
+var path = []
+var path_node = 0
+var moving_to_path
+###
+
 var target
 var last_target_origin
 var original_origin
@@ -25,8 +38,7 @@ var active_attack_tool
 var is_attacking = false
 var attack_heard = false
 
-onready var particles = $Body/bullet_mark/CPUParticles
-var health = 25
+var health = 35
 var last_health
 var dead = false
 
@@ -36,7 +48,7 @@ const TURN_SPEED = 4
 const GRAVITY = .98
 var y_velo = 0
 
-var preset_look_around_degrees = 45
+var preset_look_around_degrees = 90
 var look_around_degrees
 var last_static_rotation
 var is_look_direction_left = true
@@ -46,6 +58,7 @@ onready var attack_timer = $attack_timer
 onready var turn_timer = $turn_timer
 onready var state_flip_timer = $state_flip_timer
 onready var forget_timer = $forget_timer
+onready var nav_timer = $nav_timer
 
 enum {
 	IDLE,
@@ -54,14 +67,14 @@ enum {
 	MOVING,
 	LOOK_AROUND,
 	FLEE,
-	DEAD_IDLE
+	DEAD_IDLE,
+	NO_STATE
 }
 
 var state = IDLE
 
 func _ready():
 	init_timer.start()
-	raycast.enabled = false
 	if !weapon_choice:
 		weapon_choice = 'pistol'
 	equip_weapon(weapon_choice)
@@ -69,8 +82,6 @@ func _ready():
 	
 	if has_hardhat:
 		hardhat.visible = true
-		
-	forget_timer.wait_time = rand_range(8, 18)
 
 	# original_origin = global_transform.origin
 
@@ -84,15 +95,10 @@ func _process(delta):
 	pain_reaction()
 	reload_manager()
 
-
 	if attack_heard:
 		state = MOVING
 	match state:
 		IDLE:
-			# if attack_heard:
-			# 	state = MOVING
-			# 	attack_heard = false
-
 			var is_target_viewable = check_target_viewable()
 			if is_target_viewable:
 				state = ALERT
@@ -103,9 +109,9 @@ func _process(delta):
 				else:
 					distance_to_original_origin = global_transform.origin.distance_to(original_origin)
 				if distance_to_original_origin > 1:
-					var direction = (original_origin - global_transform.origin)
 					anim.play("walk")
-					move_and_slide(direction.normalized(), Vector3.UP)
+					destination_origin = original_origin
+					nav_manager()
 				else:
 					anim.stop()
 					anim.play("Idle")
@@ -133,7 +139,8 @@ func _process(delta):
 				state = CHASE
 
 			else:
-				print("No target and no last target origin.")
+				# print("No target and no last target origin.")
+				pass
 
 		CHASE:
 			anim.play("walk")
@@ -142,8 +149,12 @@ func _process(delta):
 				if is_target_viewable:
 					set_last_target_origin()
 					face_target()
-					var direction = (target.global_transform.origin - global_transform.origin)
-					move_and_slide(direction.normalized() * MOVE_SPEED, Vector3.UP)
+
+					# Navigate to target
+					destination_origin = target.global_transform.origin
+					nav_live_tracking = true
+					nav_manager()
+
 					var distance = global_transform.origin.distance_to(target.global_transform.origin)
 					if distance <= 5:
 						state = ALERT
@@ -153,12 +164,18 @@ func _process(delta):
 					var distance = global_transform.origin.distance_to(last_target_origin)
 					if distance < 1:
 						state = LOOK_AROUND
-					move_and_slide(direction.normalized(), Vector3.UP)
+
+					# Navigate to last_target_origin
+					destination_origin = last_target_origin
+					nav_live_tracking = false
+					nav_manager()
+
 					if forget_timer.is_stopped():
 						forget_timer.start()
 
 				else:
-					print("I guess target can't be seen and no last target was found")
+					# print("I guess target can't be seen and no last target was found")
+					pass
 
 
 			else:
@@ -168,14 +185,19 @@ func _process(delta):
 					var distance = global_transform.origin.distance_to(last_target_origin)
 					if distance < 1:
 						state = LOOK_AROUND
-					move_and_slide(direction.normalized(), Vector3.UP)
+
+					# Navigate to last target origin
+					destination_origin = last_target_origin
+					nav_live_tracking = false
+					nav_manager()
+
 					if forget_timer.is_stopped():
 						forget_timer.start()
-					# state = LOOK_AROUND
 
 		MOVING:
 			if attack_heard:
 				face_origin(last_target_origin)
+				update_nav_path(last_target_origin)
 				attack_heard = false
 
 			var is_target_viewable = check_target_viewable()
@@ -185,7 +207,12 @@ func _process(delta):
 				var distance = global_transform.origin.distance_to(last_target_origin)
 				if distance < 1:
 					state = LOOK_AROUND
-				move_and_slide(direction.normalized(), Vector3.UP)
+
+				# Navigate to last_target_origin
+				destination_origin = last_target_origin
+				nav_live_tracking = false
+				nav_manager()
+
 				if forget_timer.is_stopped():
 					forget_timer.start()
 				# state = LOOK_AROUND
@@ -194,25 +221,8 @@ func _process(delta):
 			if target or is_target_viewable:
 				state = CHASE
 			
-			if !target or !is_target_viewable:
+			if !target or !is_target_viewable or attack_heard:
 				face_origin(last_target_origin)
-
-			# if target:
-			# 	# var is_target_viewable = check_target_viewable()
-			# 	# if is_target_viewable:
-			# 	# 	state = CHASE
-			# 	state = CHASE
-
-			# elif !target and last_target_origin:
-			# 	var direction = (last_target_origin - global_transform.origin)
-			# 	var distance = global_transform.origin.distance_to(last_target_origin)
-			# 	if distance < 1:
-			# 		state = LOOK_AROUND
-			# 	move_and_slide(direction.normalized(), Vector3.UP)
-			# 	if forget_timer.is_stopped():
-			# 		forget_timer.start()
-			# 	# state = LOOK_AROUND
-			# 	anim.play("walk")
 
 			if !target and !last_target_origin:
 				state = IDLE
@@ -245,6 +255,9 @@ func _process(delta):
 			# anim.play("die")
 			# anim.queue("die_idle")
 			# dead = true
+
+		NO_STATE:
+			pass
 
 func equip_weapon(weapon):
 	for held in hand.get_children():
@@ -281,10 +294,33 @@ func spawn_pistol():
 
 func pain_reaction():
 	if !dead and health < last_health:
-		anim.stop()
 		anim.play("pain")
 		anim.queue("Idle")
 	last_health = health
+
+func nav_manager():
+	# path = nav.get_simple_path(global_transform.origin, player.global_transform.origin)
+	if !path:
+		# update_nav_path(player.global_transform.origin) # Working
+		update_nav_path(destination_origin)
+	elif path and nav_timer.is_stopped() and nav_live_tracking:
+		nav_timer.start()
+
+	# print('Moving to node ', path_node, ' of ', path.size())
+	if path_node < path.size():
+		var direction = (path[path_node] - global_transform.origin)
+		if direction.length() < 1:
+			path_node += 1
+		else:
+			move_and_slide(direction.normalized(), Vector3.UP)
+		return false
+	else:
+		return true
+
+func update_nav_path(goal_pos):
+	path = nav.get_simple_path(global_transform.origin, player.global_transform.origin)
+	path = nav.get_simple_path(global_transform.origin, goal_pos)
+	path_node = 0
 
 func death_manager():
 	if dead:
@@ -294,7 +330,6 @@ func death_manager():
 		anim.stop()
 		anim.play("die")
 		anim.queue("die_idle")
-		$Body/Head/goggle1.visible = false
 		if active_attack_tool:
 			if active_attack_tool.editor_description == 'pistol':
 				spawn_weapon(res_pistol_w)
@@ -312,7 +347,6 @@ func death_manager():
 
 func attack_manager(chosen_raycast):
 	if is_attacking:
-		raycast.enabled = true
 		anim_raycast.play("bounce")
 		anim_raycast.queue("bounce")
 		active_attack_tool.attack(chosen_raycast)
@@ -321,7 +355,6 @@ func attack_manager(chosen_raycast):
 	else:
 		# anim_raycast.stop()
 		# anim_raycast.play("Idle")
-		raycast.enabled = false
 		if attack_timer.is_stopped():
 			attack_timer.start()
 
@@ -392,9 +425,13 @@ func _on_forget_timer_timeout():
 	state = LOOK_AROUND
 
 func _on_init_timer_timeout():
-	print('Setting original origin.')
+	# print('Setting original origin.')
 	original_origin = global_transform.origin
-	print(original_origin)
+	if nav_path == "":
+		nav = false
 
 func _on_attack_timer_timeout():
 	is_attacking = true
+
+func _on_nav_timer_timeout():
+	update_nav_path(player.global_transform.origin)

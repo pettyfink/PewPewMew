@@ -1,0 +1,13 @@
+[remap]
+
+importer="qodot.map"
+type="Resource"
+path="res://.import/sket.1.map-b70a1227d8b85623a32cc7666b6a9443.tres"
+
+[deps]
+
+source_file="res://maps/autosave/sket.1.map"
+dest_files=[ "res://.import/sket.1.map-b70a1227d8b85623a32cc7666b6a9443.tres" ]
+
+[params]
+

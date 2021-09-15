@@ -1,0 +1,13 @@
+[remap]
+
+importer="qodot.map"
+type="Resource"
+path="res://.import/sket.map-67f773bc0af9750137a4bd531673a01a.tres"
+
+[deps]
+
+source_file="res://maps/sket.map"
+dest_files=[ "res://.import/sket.map-67f773bc0af9750137a4bd531673a01a.tres" ]
+
+[params]
+

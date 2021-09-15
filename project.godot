@@ -213,7 +213,7 @@ _global_script_class_icons={
 [application]
 
 config/name="PewPewMew"
-run/main_scene="res://scenes/World.tscn"
+run/main_scene="res://scenes/combat_world3.tscn"
 config/icon="res://icon.png"
 
 [editor_plugins]

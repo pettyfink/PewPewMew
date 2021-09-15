@@ -1,0 +1,14 @@
+[remap]
+
+importer="qodot.wad"
+type="Resource"
+path="res://.import/exports.wad-b7d0efe4b9f681e875a88751ab57edfe.tres"
+
+[deps]
+
+source_file="res://maps/wads/exports.wad"
+dest_files=[ "res://.import/exports.wad-b7d0efe4b9f681e875a88751ab57edfe.tres" ]
+
+[params]
+
+palette_file="res://addons/qodot/palette.lmp"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://scripts/shotgun_p.gd" type="Script" id=1]
 
@@ -411,6 +411,9 @@ albedo_color = Color( 1, 0.215686, 0, 0.803922 )
 flags_transparent = true
 albedo_color = Color( 0.792157, 0.792157, 0.792157, 0.792157 )
 
+[sub_resource type="SphereShape" id=18]
+radius = 35.0
+
 [node name="shotgun_p" type="Spatial" groups=[
 "scattercast",
 ]]
@@ -475,3 +478,8 @@ transform = Transform( 1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.85011, 0, 0, -1.04556 )
 visible = false
 mesh = SubResource( 15 )
 material/0 = SubResource( 17 )
+
+[node name="sound_area" type="Area" parent="."]
+
+[node name="sound_collision_shape" type="CollisionShape" parent="sound_area"]
+shape = SubResource( 18 )

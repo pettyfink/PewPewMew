@@ -1462,7 +1462,7 @@ albedo_color = Color( 0, 0, 0, 1 )
 albedo_color = Color( 0.529412, 0.529412, 0.529412, 1 )
 
 [sub_resource type="SphereShape" id=13]
-radius = 11.8129
+radius = 35.0
 
 [node name="pistol_p" type="Spatial"]
 script = ExtResource( 1 )
